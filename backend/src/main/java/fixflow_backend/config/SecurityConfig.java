@@ -1,5 +1,7 @@
 package fixflow_backend.config;
 
+import fixflow_backend.entity.User;
+import fixflow_backend.repository.UserRepository;
 import fixflow_backend.security.JwtAuthenticationFilter;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -9,6 +11,10 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
+
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -27,18 +33,24 @@ import java.util.List;
 public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
+    private final UserRepository userRepository;
 
     @Value("${app.cors.allowed-origin}")
     private String allowedOrigin;
 
 
     public SecurityConfig(
-            JwtAuthenticationFilter jwtAuthenticationFilter
+            JwtAuthenticationFilter jwtAuthenticationFilter,
+            UserRepository userRepository
     ) {
-        this.jwtAuthenticationFilter =
-                jwtAuthenticationFilter;
+        this.jwtAuthenticationFilter = jwtAuthenticationFilter;
+        this.userRepository = userRepository;
     }
 
+
+    // =========================================================
+    // PASSWORD ENCODER
+    // =========================================================
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -47,6 +59,43 @@ public class SecurityConfig {
     }
 
 
+    // =========================================================
+    // DATABASE USER DETAILS SERVICE
+    // =========================================================
+
+    @Bean
+    public UserDetailsService userDetailsService() {
+
+        return email -> {
+
+            User user = userRepository
+                    .findByEmail(email)
+                    .orElseThrow(() ->
+                            new UsernameNotFoundException(
+                                    "User not found: " + email
+                            )
+                    );
+
+
+            SimpleGrantedAuthority authority =
+                    new SimpleGrantedAuthority(
+                            "ROLE_" + user.getRole().name()
+                    );
+
+
+            return org.springframework.security.core.userdetails.User
+                    .withUsername(user.getEmail())
+                    .password(user.getPassword())
+                    .authorities(authority)
+                    .build();
+        };
+    }
+
+
+    // =========================================================
+    // SECURITY FILTER CHAIN
+    // =========================================================
+
     @Bean
     public SecurityFilterChain securityFilterChain(
             HttpSecurity http
@@ -54,35 +103,35 @@ public class SecurityConfig {
 
         http
 
-                /*
-                 * Enable CORS.
-                 */
+                // Enable CORS
                 .cors(cors ->
                         cors.configurationSource(
                                 corsConfigurationSource()
                         )
                 )
 
-                /*
-                 * Disable CSRF because
-                 * authentication is stateless JWT.
-                 */
+                // JWT authentication does not use CSRF sessions
                 .csrf(csrf ->
                         csrf.disable()
                 )
 
-                /*
-                 * Do not create HTTP sessions.
-                 */
+                // FixFlow uses JWT, not HTTP sessions
                 .sessionManagement(session ->
                         session.sessionCreationPolicy(
                                 SessionCreationPolicy.STATELESS
                         )
                 )
 
-                /*
-                 * Configure endpoint permissions.
-                 */
+                // Disable default browser login mechanisms
+                .formLogin(form ->
+                        form.disable()
+                )
+
+                .httpBasic(basic ->
+                        basic.disable()
+                )
+
+                // Endpoint authorization
                 .authorizeHttpRequests(auth ->
                         auth
 
@@ -96,10 +145,7 @@ public class SecurityConfig {
                                 .authenticated()
                 )
 
-                /*
-                 * Run our JWT authentication filter
-                 * before Spring's username/password filter.
-                 */
+                // Validate JWT before Spring authentication filter
                 .addFilterBefore(
                         jwtAuthenticationFilter,
                         UsernamePasswordAuthenticationFilter.class
@@ -110,11 +156,10 @@ public class SecurityConfig {
     }
 
 
-    /*
-     * =========================================================
-     * CORS CONFIGURATION
-     * =========================================================
-     */
+    // =========================================================
+    // CORS CONFIGURATION
+    // =========================================================
+
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
 
@@ -122,13 +167,6 @@ public class SecurityConfig {
                 new CorsConfiguration();
 
 
-        /*
-         * Local:
-         * http://localhost:5173
-         *
-         * Production:
-         * value comes from FRONTEND_URL
-         */
         configuration.setAllowedOrigins(
                 List.of(
                         allowedOrigin
@@ -156,9 +194,7 @@ public class SecurityConfig {
         );
 
 
-        configuration.setAllowCredentials(
-                true
-        );
+        configuration.setAllowCredentials(true);
 
 
         UrlBasedCorsConfigurationSource source =
