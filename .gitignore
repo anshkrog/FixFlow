@@ -1,30 +1,54 @@
 # =========================
-# FixFlow Git Ignore
+# BACKEND
 # =========================
 
-# IntelliJ IDEA
-.idea/
-*.iml
-
-# VS Code
-.vscode/
-
-# Java / Maven
 backend/target/
-*.class
+backend/.idea/
+backend/*.iml
 
-# Node / React
+# Environment / secrets
+.env
+.env.*
+backend/.env
+frontend/.env
+frontend/.env.*
+
+# =========================
+# FRONTEND
+# =========================
+
 frontend/node_modules/
 frontend/dist/
 
-# Environment variables
-.env
-.env.*
-!.env.example
+# Vite / local files
+frontend/.vite/
 
-# Logs
-*.log
+# =========================
+# INTELLIJ
+# =========================
 
-# Operating System
+.idea/
+*.iml
+out/
+
+# =========================
+# OS / EDITOR
+# =========================
+
 .DS_Store
 Thumbs.db
+.vscode/
+
+# =========================
+# LOGS
+# =========================
+
+*.log
+logs/
+
+# =========================
+# TEMP / CACHE
+# =========================
+
+*.tmp
+*.temp
