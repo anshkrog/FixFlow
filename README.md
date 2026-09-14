@@ -1,1010 +1,496 @@
-# 🏢 FixFlow – Smart Residential Complaint & Maintenance Management System
+# FixFlow
 
-FixFlow is a full-stack residential complaint and maintenance management platform designed to help apartments, hostels, housing societies, and residential communities efficiently report, prioritize, assign, track, and resolve maintenance issues.
+### Smart Civic Complaint & Maintenance Management System
 
-The system provides dedicated functionality for **Residents, Maintenance Staff, and Administrators**, allowing the complete complaint lifecycle to be managed through a centralized digital platform.
+FixFlow is a full-stack web application designed to simplify the process of reporting, managing, assigning, and resolving civic and facility-related complaints.
 
----
-
-## 📌 Overview
-
-Maintenance complaints in residential communities are often managed through phone calls, WhatsApp groups, registers, or verbal communication.
-
-These methods can lead to:
-
-- Lost or forgotten complaints
-- Delayed maintenance
-- Lack of complaint tracking
-- Poor communication
-- No clear staff accountability
-- Difficulty identifying urgent issues
-- No centralized complaint history
-- Difficulty analyzing recurring maintenance problems
-
-**FixFlow** provides a structured digital workflow where every complaint can be reported, prioritized, assigned, tracked, updated, and resolved.
+The system provides dedicated workspaces for **Residents, Administrators, and Field Staff**, allowing a complaint to move through a complete workflow — from initial reporting to final resolution.
 
 ---
 
-# 🎯 Problem Statement
+## Project Overview
 
-Traditional complaint-management processes used in residential communities often lack transparency, prioritization, accountability, and centralized tracking.
+Traditional complaint-management processes often lack transparency, structured prioritization, and clear responsibility assignment.
 
-For example, a resident may report:
+FixFlow provides a centralized platform where:
 
-> "Water leakage in Block A"
+- Residents can report civic issues and monitor their complaints.
+- Administrators can review complaints, set priorities, and assign field staff.
+- Staff members can view assigned tasks and update their progress.
+- Complaint status is tracked throughout its lifecycle.
 
-through a phone call or messaging group.
-
-However, there may be no reliable way to determine:
-
-- When the complaint was reported
-- How urgent the issue is
-- Which staff member is responsible
-- Whether work has started
-- How long resolution took
-- Whether the same issue occurred previously
-
-FixFlow addresses these limitations by providing a centralized complaint and maintenance management system.
+The application uses a React frontend, Spring Boot REST API, MySQL database, and JWT-based authentication.
 
 ---
 
-# 💡 Proposed Solution
+## Screenshots
 
-FixFlow provides a role-based platform through which:
+### Resident Issue Reporting
 
-### Residents can
+Residents can select an issue category, provide complaint details and submit civic problems directly to the system.
 
-- Create an account
-- Securely log in
-- Submit maintenance complaints
+![FixFlow Report Issue](docs/screenshots/report-issue.png)
+
+### Admin Complaint Management
+
+Administrators can monitor complaints, filter the complaint queue, change priorities and assign staff members.
+
+![FixFlow Admin Dashboard](docs/screenshots/admin-dashboard.png)
+
+### Staff Field Workspace
+
+Assigned staff can view their work queue and move complaints through the resolution workflow.
+
+![FixFlow Staff Dashboard](docs/screenshots/staff-dashboard.png)
+
+---
+
+## Core Features
+
+### Resident
+
+- Secure account registration and login
+- Submit civic complaints
 - Select complaint categories
-- Provide complaint descriptions
+- Provide issue title, description and location
+- View personal complaint history
 - Track complaint status
-- Monitor complaint progress
-- View previous complaints
-
-### Maintenance Staff can
-
-- Securely log in
-- View assigned complaints
 - View complaint priority
-- Update work status
-- Manage assigned maintenance tasks
-- Mark completed issues as resolved
+- View assigned staff information
+- Complaint lifecycle visualization
+- Responsive resident dashboard
 
-### Administrators can
+### Administrator
 
-- Monitor all complaints
-- Manage users
-- Assign complaints to maintenance staff
-- Monitor complaint priorities
-- Track staff workload
-- Monitor complaint resolution
-- View maintenance activity and analytics
+- Secure admin dashboard
+- View all submitted complaints
+- Search complaints
+- Filter complaints by status
+- Filter complaints by priority
+- Set complaint priority
+- Assign field staff
+- Monitor active work
+- Monitor resolved complaints
+- View operational statistics
 
----
+### Field Staff
 
-# ⭐ Key Features
-
-## 🔐 Secure Authentication
-
-FixFlow provides secure authentication using:
-
-- Spring Security
-- BCrypt password hashing
-- JSON Web Tokens (JWT)
-- Role-based authorization
-
-Passwords are never stored as plain text.
-
-After successful authentication, a JWT is generated and used to access protected API endpoints.
-
----
-
-## 👥 Role-Based Access Control
-
-The system supports three primary user roles:
-
-```text
-RESIDENT
-STAFF
-ADMIN
-```
-
-Each role has different permissions.
-
-### RESIDENT
-
-Residents can:
-
-- Submit complaints
-- View their complaints
-- Track complaint status
-- View complaint history
-- Monitor maintenance progress
-
-### STAFF
-
-Maintenance staff can:
-
+- Secure staff workspace
 - View assigned complaints
-- View complaint details
-- Update complaint progress
-- Change maintenance status
-- Mark assigned issues as resolved
-
-### ADMIN
-
-Administrators can:
-
-- View all complaints
-- Manage complaint assignments
-- Manage users
-- Manage staff
-- Monitor complaint priorities
-- Track system activity
-- View maintenance analytics
+- Search assigned tasks
+- View complaint priority and location
+- Start assigned work
+- Update complaint status
+- Mark completed work as resolved
+- Monitor personal task statistics
 
 ---
 
-# 📝 Complaint Management
-
-Residents can create complaints containing information such as:
-
-- Complaint title
-- Description
-- Category
-- Location
-- Date reported
-- Priority
-- Current status
-
-Each complaint receives a unique identifier that can be used throughout its lifecycle.
-
----
-
-# 🧠 Smart Complaint Prioritization
-
-FixFlow includes a complaint-prioritization mechanism to help important maintenance issues receive attention before less critical requests.
-
-Priority can be determined using factors such as:
-
-- Complaint category
-- Severity
-- Urgency
-- Waiting time
-- Repeated complaints
-- Potential impact
-
-Complaints can then be classified into priority levels such as:
-
-```text
-LOW
-MEDIUM
-HIGH
-CRITICAL
-```
-
-This helps administrators and maintenance staff focus on urgent problems first.
-
----
-
-# 🔄 Complaint Lifecycle
-
-A typical complaint follows a structured workflow:
+## Complaint Workflow
 
 ```text
 Resident
    │
+   │ Reports issue
    ▼
-Complaint Submitted
+ OPEN
    │
+   │ Admin reviews complaint
+   │ Sets priority
+   │ Assigns staff
    ▼
-Complaint Categorized
+ ASSIGNED
    │
+   │ Staff begins work
    ▼
-Priority Determined
+ IN_PROGRESS
    │
+   │ Staff completes work
    ▼
-Administrator Review
-   │
-   ▼
-Staff Assigned
-   │
-   ▼
-Work Started
-   │
-   ▼
-Status Updated
-   │
-   ▼
-Issue Resolved
-   │
-   ▼
-Complaint Closed
+ RESOLVED
 ```
+
+This provides clear ownership and visibility throughout the complaint lifecycle.
 
 ---
 
-# 📊 Complaint Status Tracking
+## Role-Based Architecture
 
-Complaints can move through statuses such as:
+FixFlow supports three application roles:
+
+| Role | Responsibility |
+|------|----------------|
+| RESIDENT | Reports and tracks civic issues |
+| ADMIN | Prioritizes complaints and assigns staff |
+| STAFF | Handles assigned complaints and updates progress |
+
+Authorization is enforced by the Spring Boot backend rather than relying only on frontend route protection.
+
+---
+
+## Technology Stack
+
+### Frontend
+
+- React
+- Vite
+- JavaScript
+- Axios
+- React Router
+- CSS
+- Lucide Icons
+
+### Backend
+
+- Java
+- Spring Boot
+- Spring Security
+- Spring Data JPA
+- Hibernate
+- REST APIs
+- Maven
+
+### Authentication & Security
+
+- JSON Web Tokens (JWT)
+- BCrypt password hashing
+- Stateless authentication
+- Role-based authorization
+- Protected REST endpoints
+- CORS configuration
+
+### Database
+
+- MySQL
+
+### Development Tools
+
+- IntelliJ IDEA
+- Visual Studio Code
+- Postman
+- Git
+- GitHub
+
+---
+
+## System Architecture
 
 ```text
-OPEN
-ASSIGNED
-IN_PROGRESS
-RESOLVED
-CLOSED
+┌───────────────────────────────┐
+│          React + Vite         │
+│                               │
+│ Resident │ Admin │ Staff      │
+└───────────────┬───────────────┘
+                │
+                │ HTTPS / REST API
+                │ JWT Bearer Token
+                ▼
+┌───────────────────────────────┐
+│       Spring Boot Backend     │
+│                               │
+│ Controllers                   │
+│ Services                      │
+│ Spring Security + JWT         │
+│ Spring Data JPA               │
+└───────────────┬───────────────┘
+                │
+                │ JPA / Hibernate
+                ▼
+┌───────────────────────────────┐
+│             MySQL             │
+│                               │
+│ Users                         │
+│ Complaints                    │
+└───────────────────────────────┘
 ```
 
-This gives residents visibility into the progress of their maintenance requests.
-
 ---
 
-# 👨‍🔧 Staff Assignment
-
-Administrators can assign maintenance requests to appropriate staff members.
-
-Assignment information can include:
-
-- Complaint
-- Assigned staff member
-- Assignment date
-- Current status
-- Completion information
-
-This improves accountability because each maintenance request has a responsible staff member.
-
----
-
-# 📜 Complaint History
-
-FixFlow maintains historical information about complaints and their status changes.
-
-This can help answer questions such as:
-
-- When was the complaint created?
-- When was staff assigned?
-- When did work begin?
-- When was the complaint resolved?
-- How long did resolution take?
-
-Complaint history also helps identify recurring maintenance issues.
-
----
-
-# 📊 Dashboard
-
-FixFlow provides role-specific dashboards.
-
-## Resident Dashboard
-
-The resident dashboard displays:
-
-- Total complaints
-- Open complaints
-- In-progress complaints
-- Resolved complaints
-- Recent complaints
-- Complaint status
-- Quick Report Issue option
-
-## Staff Dashboard
-
-The staff dashboard displays:
-
-- Assigned complaints
-- Pending tasks
-- High-priority complaints
-- In-progress maintenance
-- Completed tasks
-
-## Admin Dashboard
-
-The administrator dashboard displays:
-
-- Total complaints
-- Open complaints
-- Critical complaints
-- Resolved complaints
-- Staff workload
-- Complaint categories
-- Priority distribution
-- Resolution statistics
-
----
-
-# 🏗️ System Architecture
-
-FixFlow follows a modern full-stack layered architecture.
+## Project Structure
 
 ```text
-                 ┌───────────────────────┐
-                 │       USER            │
-                 └───────────┬───────────┘
-                             │
-                             ▼
-                 ┌───────────────────────┐
-                 │    React Frontend     │
-                 │ HTML / CSS / JS       │
-                 └───────────┬───────────┘
-                             │
-                         REST API
-                             │
-                             ▼
-              ┌──────────────────────────────┐
-              │      Spring Boot Backend     │
-              ├──────────────────────────────┤
-              │ Controllers                  │
-              │ DTOs                         │
-              │ Services                     │
-              │ Security                     │
-              │ Repositories                 │
-              │ Entities                     │
-              └──────────────┬───────────────┘
-                             │
-                       Spring Data JPA
-                             │
-                             ▼
-                 ┌───────────────────────┐
-                 │        MySQL          │
-                 │      Database         │
-                 └───────────────────────┘
+FixFlow/
+│
+├── backend/
+│   ├── src/main/java/fixflow_backend/
+│   │   ├── config/
+│   │   ├── controller/
+│   │   ├── dto/
+│   │   ├── entity/
+│   │   ├── exception/
+│   │   ├── repository/
+│   │   ├── security/
+│   │   └── service/
+│   │
+│   ├── src/main/resources/
+│   │   └── application.properties
+│   │
+│   └── pom.xml
+│
+├── frontend/
+│   ├── src/
+│   │   ├── components/
+│   │   ├── pages/
+│   │   ├── services/
+│   │   ├── App.jsx
+│   │   └── index.css
+│   │
+│   ├── package.json
+│   └── vite.config.js
+│
+├── docs/
+│   └── screenshots/
+│
+├── .gitignore
+└── README.md
 ```
 
 ---
 
-# 🔧 Backend Architecture
+## Authentication Flow
 
-The Spring Boot backend follows a layered architecture:
+When a user logs in:
+
+1. The frontend sends the login credentials to the authentication API.
+2. The backend verifies the password using BCrypt.
+3. A signed JWT is generated after successful authentication.
+4. The frontend stores the authentication information.
+5. Axios attaches the JWT to protected API requests.
+
+Protected requests use:
 
 ```text
-HTTP Request
-     │
-     ▼
-Controller
-     │
-     ▼
-DTO
-     │
-     ▼
-Service
-     │
-     ▼
-Repository
-     │
-     ▼
-JPA / Hibernate
-     │
-     ▼
-MySQL
+Authorization: Bearer <JWT>
 ```
 
-### Controller Layer
-
-Handles incoming REST API requests and sends HTTP responses.
-
-### DTO Layer
-
-Controls the data transferred between the client and backend.
-
-DTOs prevent unnecessary or sensitive entity information from being exposed.
-
-### Service Layer
-
-Contains business logic such as:
-
-- User registration
-- Authentication
-- Complaint processing
-- Priority calculations
-- Staff assignment
-- Status management
-
-### Repository Layer
-
-Uses Spring Data JPA to communicate with the database.
-
-### Entity Layer
-
-Maps Java objects to relational database tables using JPA/Hibernate.
+The backend validates the token before allowing access to protected resources.
 
 ---
 
-# 🔐 Authentication Architecture
+## REST API Overview
 
-FixFlow uses JWT-based stateless authentication.
-
-```text
-User
- │
- │ Email + Password
- ▼
-Login API
- │
- ▼
-UserService
- │
- ▼
-Database User Lookup
- │
- ▼
-BCrypt Password Verification
- │
- ▼
-JWT Generation
- │
- ▼
-JWT Returned to Frontend
-```
-
-For protected requests:
-
-```text
-React
- │
- │ Authorization:
- │ Bearer <JWT>
- ▼
-JWT Authentication Filter
- │
- ▼
-Validate Token
- │
- ▼
-Extract User Identity
- │
- ▼
-Spring Security Context
- │
- ▼
-Authorization Check
- │
- ▼
-Protected Controller
-```
-
----
-
-# 🔑 Password Security
-
-Passwords are protected using BCrypt.
-
-Example:
-
-```text
-User password:
-
-password123
-
-        ↓
-
-BCrypt
-
-        ↓
-
-$2a$10$xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-```
-
-Only the BCrypt hash is stored in MySQL.
-
-During login, the entered password is verified against the stored hash.
-
-The original password is never retrieved from the database.
-
----
-
-# 🎟️ JWT Authentication
-
-After successful login, the backend generates a JSON Web Token.
-
-Example response:
-
-```json
-{
-  "id": 3,
-  "name": "Ansh Kumar",
-  "email": "user@example.com",
-  "role": "RESIDENT",
-  "token": "eyJhbGciOiJIUzI1NiJ9...",
-  "message": "Login successful"
-}
-```
-
-The frontend sends the token with protected requests:
-
-```text
-Authorization: Bearer <JWT_TOKEN>
-```
-
-Spring Security validates the token before allowing access.
-
----
-
-# 🌐 REST API Design
-
-Example authentication endpoints:
+### Authentication
 
 ```http
 POST /api/auth/register
 POST /api/auth/login
 ```
 
-Example complaint endpoints:
+### Resident Complaints
 
 ```http
-POST   /api/complaints
-GET    /api/complaints
-GET    /api/complaints/{id}
-PUT    /api/complaints/{id}
-DELETE /api/complaints/{id}
+POST /api/complaints
+GET  /api/complaints/my
+GET  /api/complaints/{id}
 ```
 
-Example resident endpoint:
+### Administrator
 
 ```http
-GET /api/complaints/my
+GET   /api/admin/complaints
+GET   /api/admin/staff
+PATCH /api/admin/complaints/{id}/priority
+PATCH /api/admin/complaints/{id}/assign
 ```
 
-Example staff endpoints:
+### Staff
 
 ```http
-GET /api/staff/complaints
-PUT /api/staff/complaints/{id}/status
-```
-
-Example admin endpoints:
-
-```http
-GET /api/admin/complaints
-PUT /api/admin/complaints/{id}/assign
-GET /api/admin/users
-GET /api/admin/dashboard
+GET   /api/staff/complaints
+PATCH /api/staff/complaints/{id}/status
 ```
 
 ---
 
-# 🗄️ Database Design
+## Environment Variables
 
-FixFlow uses **MySQL** as its relational database.
+Sensitive configuration is not stored directly in the source code.
 
-Major database entities include:
+### Backend
+
+The backend requires:
 
 ```text
-Users
-Complaints
-Categories
-Assignments
-Complaint History
-Priority Information
+DB_USERNAME
+DB_PASSWORD
+JWT_SECRET
+FRONTEND_URL
 ```
 
-Relationships between these entities allow the complete complaint lifecycle to be maintained.
+For production deployment, the database URL should also be configured using an environment variable.
 
----
+Example:
 
-# 👤 User Entity
+```properties
+spring.datasource.url=${DB_URL}
+spring.datasource.username=${DB_USERNAME}
+spring.datasource.password=${DB_PASSWORD}
 
-Example user information:
+jwt.secret=${JWT_SECRET}
+
+app.cors.allowed-origin=${FRONTEND_URL}
+```
+
+Never commit real passwords or JWT secrets to the repository.
+
+### Frontend
+
+The deployed frontend can configure the backend address using:
 
 ```text
-id
-name
-email
-password
-phone
-role
-created_at
-updated_at
+VITE_API_BASE_URL
 ```
 
-The email is unique and passwords are stored as BCrypt hashes.
-
----
-
-# 🛠️ Technology Stack
-
-## Frontend
-
-- React.js
-- JavaScript
-- HTML5
-- CSS3
-- Responsive UI
-
-## Backend
-
-- Java
-- Spring Boot
-- Spring MVC
-- Spring Security
-- Spring Data JPA
-- Hibernate
-
-## Database
-
-- MySQL
-
-## Authentication & Security
-
-- JWT
-- Spring Security
-- BCrypt
-- Role-Based Access Control
-
-## API
-
-- RESTful APIs
-- JSON
-
-## Build Tool
-
-- Maven
-
-## Testing & Development Tools
-
-- Postman
-- IntelliJ IDEA
-
-## Version Control
-
-- Git
-- GitHub
-
----
-
-# 📂 Project Structure
+Example:
 
 ```text
-FixFlow/
-│
-├── backend/
-│   │
-│   ├── src/main/java/fixflow_backend/
-│   │   │
-│   │   ├── config/
-│   │   │
-│   │   ├── controller/
-│   │   │
-│   │   ├── dto/
-│   │   │
-│   │   ├── entity/
-│   │   │
-│   │   ├── exception/
-│   │   │
-│   │   ├── repository/
-│   │   │
-│   │   ├── security/
-│   │   │
-│   │   ├── service/
-│   │   │
-│   │   └── BackendApplication.java
-│   │   │
-│   │   └── resources/
-│   │       └── application.properties
-│   │
-│   └── pom.xml
-│
-├── frontend/
-│   │
-│   ├── src/
-│   │   ├── components/
-│   │   ├── pages/
-│   │   ├── services/
-│   │   ├── context/
-│   │   └── assets/
-│   │
-│   └── package.json
-│
-└── README.md
+VITE_API_BASE_URL=https://your-backend-domain.example/api
 ```
 
 ---
 
-# 🧪 API Testing
+## Running FixFlow Locally
 
-Postman is used to test backend APIs independently from the frontend.
-
-Testing includes:
-
-- Registration
-- Login
-- Input validation
-- Incorrect credentials
-- JWT generation
-- JWT validation
-- Protected endpoints
-- Role authorization
-- Complaint creation
-- Complaint retrieval
-- Complaint updates
-- Staff assignment
-
----
-
-# ⚠️ Error Handling
-
-FixFlow provides structured API error responses.
-
-For example, invalid login credentials return:
-
-```json
-{
-  "message": "Invalid email or password"
-}
-```
-
-with:
-
-```text
-HTTP 401 Unauthorized
-```
-
-Validation and business errors are handled centrally to keep API responses consistent.
-
----
-
-# 🖥️ User Interface
-
-FixFlow provides a modern responsive interface designed for desktop and mobile devices.
-
-The UI includes:
-
-- Authentication screens
-- Navigation sidebar
-- Dashboard statistics
-- Complaint cards
-- Status badges
-- Priority indicators
-- Complaint forms
-- Complaint timeline
-- Tables and filters
-- Staff assignment interface
-- Administrative analytics
-
----
-
-# 🚀 Deployment Architecture
-
-The production application follows:
-
-```text
-                Internet
-                   │
-                   ▼
-          ┌─────────────────┐
-          │ React Frontend  │
-          └────────┬────────┘
-                   │
-                HTTPS
-                   │
-                   ▼
-          ┌─────────────────┐
-          │ Spring Boot API │
-          └────────┬────────┘
-                   │
-                   ▼
-          ┌─────────────────┐
-          │ MySQL Database  │
-          └─────────────────┘
-```
-
-Sensitive configuration such as:
-
-```text
-Database credentials
-JWT secret keys
-Production configuration
-```
-
-is managed using environment variables rather than being committed directly to the source repository.
-
----
-
-# ▶️ Running the Project Locally
-
-## Prerequisites
+### Prerequisites
 
 Install:
 
-```text
-Java
-Maven
-MySQL
-Node.js
-npm
-Git
-```
+- Java
+- Maven
+- Node.js
+- npm
+- MySQL
+- Git
 
----
-
-## 1. Clone Repository
+### 1. Clone the Repository
 
 ```bash
-git clone <repository-url>
-```
-
-```bash
+git clone https://github.com/anshkrog/FixFlow.git
 cd FixFlow
 ```
 
----
+### 2. Create the Database
 
-## 2. Configure MySQL
-
-Create the database:
+Create a MySQL database:
 
 ```sql
 CREATE DATABASE fixflow;
 ```
 
-Configure the required database environment variables.
+### 3. Configure Backend Environment Variables
 
----
+Configure the following values in your local environment:
 
-## 3. Start Backend
+```text
+DB_USERNAME
+DB_PASSWORD
+JWT_SECRET
+```
+
+`JWT_SECRET` should be a strong Base64-encoded signing key.
+
+### 4. Start the Backend
 
 ```bash
 cd backend
+./mvnw spring-boot:run
 ```
 
-```bash
-mvn spring-boot:run
+On Windows PowerShell:
+
+```powershell
+cd backend
+.\mvnw.cmd spring-boot:run
 ```
 
-The backend runs on:
+The backend runs locally on:
 
 ```text
 http://localhost:8080
 ```
 
----
-
-## 4. Start Frontend
+### 5. Start the Frontend
 
 Open another terminal:
 
 ```bash
 cd frontend
-```
-
-Install dependencies:
-
-```bash
 npm install
-```
-
-Start the application:
-
-```bash
 npm run dev
 ```
 
-Open the frontend URL displayed by the development server.
+The frontend runs locally on:
+
+```text
+http://localhost:5173
+```
 
 ---
 
-# 🔒 Security Practices
+## Security Considerations
 
-FixFlow follows several application-security practices:
+FixFlow implements several backend security measures:
 
-- Password hashing using BCrypt
-- JWT-based authentication
-- Protected backend endpoints
-- Role-based authorization
-- DTO-based API responses
-- Input validation
-- Centralized exception handling
-- Unique user emails
-- Environment-based secrets
-- Separation of authentication and authorization
+- BCrypt password hashing
+- JWT authentication
+- Stateless Spring Security configuration
+- Backend role-based authorization
+- Resident complaint ownership validation
+- Environment-based secret configuration
+- Configurable CORS origin
+- Protected administrative and staff operations
 
----
-
-# 💼 Real-World Use Cases
-
-FixFlow can be adapted for:
-
-- Apartment societies
-- Residential complexes
-- University hostels
-- PG accommodations
-- Campus maintenance
-- Housing communities
-- Facility-management organizations
+Public registration should only create resident accounts. Administrative and staff roles should not be assignable through public registration.
 
 ---
 
-# 🚀 Future Enhancements
+## Responsive Design
 
-Future versions can include:
+The FixFlow interface is designed for desktop and mobile usage.
+
+The dashboards adapt their:
+
+- Navigation
+- Summary cards
+- Complaint queues
+- Search controls
+- Action panels
+- Forms
+
+for smaller screen sizes.
+
+---
+
+## Future Enhancements
+
+Possible extensions include:
 
 - Complaint image uploads
 - Email notifications
-- Push notifications
-- Real-time status updates
-- WebSocket communication
-- Automated escalation
-- SLA tracking
-- Advanced analytics
-- Staff performance analytics
-- Recurring issue detection
-- Mobile application
-- AI-assisted complaint categorization
-- AI-based priority recommendations
+- SMS notifications
+- Map-based issue location
+- Administrative analytics
+- SLA monitoring
+- Complaint escalation
+- Multiple staff teams
+- Audit history
+- Cloud file storage
+- AI-assisted complaint categorization and prioritization
 
 ---
 
-# 🎯 Project Objectives
-
-The primary objectives of FixFlow are to:
-
-1. Digitize residential complaint management.
-2. Provide transparent complaint tracking.
-3. Improve accountability among maintenance staff.
-4. Prioritize critical maintenance problems.
-5. Provide role-specific functionality.
-6. Maintain historical maintenance records.
-7. Improve communication between residents and management.
-8. Provide administrators with useful operational insights.
-
----
-
-# 📈 Benefits
-
-FixFlow provides:
-
-- Centralized complaint management
-- Improved transparency
-- Better accountability
-- Faster complaint resolution
-- Structured maintenance workflows
-- Secure authentication
-- Priority-based issue handling
-- Historical maintenance records
-- Administrative monitoring
-- Data-driven decision making
-
----
-
-# 🎓 Concepts Demonstrated
-
-This project demonstrates practical knowledge of:
-
-- Java
-- Object-Oriented Programming
-- Spring Boot
-- Spring MVC
-- Spring Security
-- REST API development
-- Spring Data JPA
-- Hibernate
-- MySQL
-- React.js
-- Full-stack development
-- JWT authentication
-- BCrypt password hashing
-- Role-Based Access Control
-- DTO design
-- Layered architecture
-- Exception handling
-- API testing
-- Database design
-- Git/GitHub
-- Application deployment
-
----
-
-# 👨‍💻 Developer
+## Author
 
 **Ansh Kumar**
 
-B.Tech Computer Science & Engineering  
-Galgotias University
+B.Tech Computer Science & Engineering
+
+GitHub: [anshkrog](https://github.com/anshkrog)
 
 ---
 
-# 📄 Project Purpose
+## Project Status
 
-FixFlow was developed as a full-stack software engineering project to solve real-world maintenance and complaint-management challenges while demonstrating modern web development, backend architecture, database design, API security, and deployment practices.
+**Core application completed.**
+
+FixFlow currently supports the complete complaint lifecycle across Resident, Administrator and Staff roles. Production deployment configuration is the next stage.
