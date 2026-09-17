@@ -8,32 +8,47 @@ The system provides dedicated workspaces for **Residents, Administrators, and Fi
 
 ---
 
-## Project Overview
+## 🌐 Live Demo
 
-Traditional complaint-management processes often lack transparency, structured prioritization, and clear responsibility assignment.
+**Live Application:** https://fix-flow-ansh-ok.vercel.app
+
+FixFlow is deployed as a full-stack cloud application using:
+
+- **Frontend:** Vercel
+- **Backend:** Railway
+- **Database:** Railway MySQL
+
+> Public registration creates a Resident account. Administrator and Staff roles are provisioned separately for security.
+
+---
+
+## 📌 Project Overview
+
+Traditional complaint-management processes often lack transparency, structured prioritization, clear responsibility assignment, and real-time status visibility.
 
 FixFlow provides a centralized platform where:
 
 - Residents can report civic issues and monitor their complaints.
 - Administrators can review complaints, set priorities, and assign field staff.
 - Staff members can view assigned tasks and update their progress.
-- Complaint status is tracked throughout its lifecycle.
+- Complaint status is tracked throughout its complete lifecycle.
+- Role-based authorization protects administrative and staff operations.
 
-The application uses a React frontend, Spring Boot REST API, MySQL database, and JWT-based authentication.
+The application uses a **React + Vite frontend**, **Spring Boot REST API**, **MySQL database**, and **JWT-based authentication**.
 
 ---
 
-## Screenshots
+## 📸 Screenshots
 
 ### Resident Issue Reporting
 
-Residents can select an issue category, provide complaint details and submit civic problems directly to the system.
+Residents can select an issue category, provide complaint details, specify a location, and submit civic problems directly to the system.
 
 ![FixFlow Report Issue](docs/screenshots/report-issue.png)
 
 ### Admin Complaint Management
 
-Administrators can monitor complaints, filter the complaint queue, change priorities and assign staff members.
+Administrators can monitor complaints, filter the complaint queue, change priorities, and assign staff members.
 
 ![FixFlow Admin Dashboard](docs/screenshots/admin-dashboard.png)
 
@@ -45,14 +60,14 @@ Assigned staff can view their work queue and move complaints through the resolut
 
 ---
 
-## Core Features
+## ✨ Core Features
 
-### Resident
+### 👤 Resident
 
 - Secure account registration and login
 - Submit civic complaints
 - Select complaint categories
-- Provide issue title, description and location
+- Provide issue title, description, and location
 - View personal complaint history
 - Track complaint status
 - View complaint priority
@@ -60,9 +75,9 @@ Assigned staff can view their work queue and move complaints through the resolut
 - Complaint lifecycle visualization
 - Responsive resident dashboard
 
-### Administrator
+### 🛡️ Administrator
 
-- Secure admin dashboard
+- Secure administrator dashboard
 - View all submitted complaints
 - Search complaints
 - Filter complaints by status
@@ -73,7 +88,7 @@ Assigned staff can view their work queue and move complaints through the resolut
 - Monitor resolved complaints
 - View operational statistics
 
-### Field Staff
+### 🛠️ Field Staff
 
 - Secure staff workspace
 - View assigned complaints
@@ -86,7 +101,7 @@ Assigned staff can view their work queue and move complaints through the resolut
 
 ---
 
-## Complaint Workflow
+## 🔄 Complaint Workflow
 
 ```text
 Resident
@@ -110,25 +125,27 @@ Resident
  RESOLVED
 ```
 
-This provides clear ownership and visibility throughout the complaint lifecycle.
+This workflow provides clear ownership, accountability, and visibility throughout the complaint lifecycle.
 
 ---
 
-## Role-Based Architecture
+## 👥 Role-Based Architecture
 
 FixFlow supports three application roles:
 
 | Role | Responsibility |
 |------|----------------|
-| RESIDENT | Reports and tracks civic issues |
-| ADMIN | Prioritizes complaints and assigns staff |
-| STAFF | Handles assigned complaints and updates progress |
+| `RESIDENT` | Reports and tracks civic issues |
+| `ADMIN` | Prioritizes complaints and assigns staff |
+| `STAFF` | Handles assigned complaints and updates progress |
 
-Authorization is enforced by the Spring Boot backend rather than relying only on frontend route protection.
+Authorization is enforced by the **Spring Boot backend** rather than relying only on frontend route protection.
+
+This ensures that protected administrative and staff APIs cannot be accessed simply by navigating to restricted frontend routes.
 
 ---
 
-## Technology Stack
+## 🧰 Technology Stack
 
 ### Frontend
 
@@ -157,13 +174,19 @@ Authorization is enforced by the Spring Boot backend rather than relying only on
 - Stateless authentication
 - Role-based authorization
 - Protected REST endpoints
-- CORS configuration
+- Configurable CORS policy
 
 ### Database
 
 - MySQL
 
-### Development Tools
+### Deployment
+
+- Vercel
+- Railway
+- Railway MySQL
+
+### Development & Testing Tools
 
 - IntelliJ IDEA
 - Visual Studio Code
@@ -173,7 +196,7 @@ Authorization is enforced by the Spring Boot backend rather than relying only on
 
 ---
 
-## System Architecture
+## 🏗️ System Architecture
 
 ```text
 ┌───────────────────────────────┐
@@ -206,7 +229,54 @@ Authorization is enforced by the Spring Boot backend rather than relying only on
 
 ---
 
-## Project Structure
+## 🚀 Production Deployment Architecture
+
+FixFlow is deployed using separate frontend, backend, and database services.
+
+```text
+             User Browser
+                  │
+                  │ HTTPS
+                  ▼
+┌─────────────────────────────────┐
+│             Vercel              │
+│                                 │
+│      React + Vite Frontend      │
+│                                 │
+│ Resident │ Admin │ Staff        │
+└────────────────┬────────────────┘
+                 │
+                 │ HTTPS REST API
+                 │ Authorization:
+                 │ Bearer <JWT>
+                 ▼
+┌─────────────────────────────────┐
+│             Railway             │
+│                                 │
+│       Spring Boot REST API      │
+│                                 │
+│ Spring Security                 │
+│ JWT Authentication             │
+│ Service Layer                  │
+│ Spring Data JPA                │
+└────────────────┬────────────────┘
+                 │
+                 │ JDBC / Hibernate
+                 ▼
+┌─────────────────────────────────┐
+│        Railway MySQL            │
+│                                 │
+│ Users │ Complaints              │
+└─────────────────────────────────┘
+```
+
+Production-specific configuration is supplied using environment variables.
+
+Database credentials, JWT signing secrets, and deployment URLs are therefore not hard-coded into the source repository.
+
+---
+
+## 📁 Project Structure
 
 ```text
 FixFlow/
@@ -247,17 +317,21 @@ FixFlow/
 
 ---
 
-## Authentication Flow
+## 🔐 Authentication Flow
 
 When a user logs in:
 
-1. The frontend sends the login credentials to the authentication API.
-2. The backend verifies the password using BCrypt.
-3. A signed JWT is generated after successful authentication.
-4. The frontend stores the authentication information.
-5. Axios attaches the JWT to protected API requests.
+1. The frontend sends the user's credentials to the authentication API.
+2. The Spring Boot backend retrieves the corresponding user.
+3. The submitted password is verified using BCrypt.
+4. After successful authentication, the backend generates a signed JWT.
+5. The frontend stores the authentication information.
+6. Axios automatically attaches the JWT to protected API requests.
+7. The backend JWT filter validates the token.
+8. Spring Security establishes the authenticated user's role and permissions.
+9. The request is allowed only if the authenticated user has the required authorization.
 
-Protected requests use:
+Protected requests use the following header:
 
 ```text
 Authorization: Bearer <JWT>
@@ -267,7 +341,30 @@ The backend validates the token before allowing access to protected resources.
 
 ---
 
-## REST API Overview
+## 🔒 Security Implementation
+
+FixFlow implements backend security using **Spring Security and JWT authentication**.
+
+Key security features include:
+
+- BCrypt password hashing
+- JWT-based authentication
+- Stateless session management
+- Backend role-based authorization
+- Protected REST endpoints
+- Resident complaint ownership validation
+- Environment-based secret configuration
+- Configurable CORS origin
+- Protected administrative operations
+- Protected staff operations
+
+Public registration creates only `RESIDENT` accounts.
+
+Administrative and Staff roles are not assignable through the public registration request, preventing users from granting themselves elevated privileges.
+
+---
+
+## 🌐 REST API Overview
 
 ### Authentication
 
@@ -302,54 +399,122 @@ PATCH /api/staff/complaints/{id}/status
 
 ---
 
-## Environment Variables
+## 🗄️ Database Design
+
+The application currently uses two primary entities.
+
+### Users
+
+Stores application users and their roles.
+
+Important information includes:
+
+- Name
+- Email
+- Password hash
+- Phone
+- Role
+- Creation timestamp
+- Update timestamp
+
+Supported roles:
+
+```text
+RESIDENT
+ADMIN
+STAFF
+```
+
+### Complaints
+
+Stores reported issues and their lifecycle information.
+
+Important information includes:
+
+- Title
+- Description
+- Category
+- Location
+- Priority
+- Status
+- Resident
+- Assigned staff
+- Creation timestamp
+- Update timestamp
+- Resolution timestamp
+
+Supported priority levels:
+
+```text
+LOW
+MEDIUM
+HIGH
+CRITICAL
+```
+
+Complaint statuses include:
+
+```text
+OPEN
+ASSIGNED
+IN_PROGRESS
+RESOLVED
+CLOSED
+```
+
+---
+
+## ⚙️ Environment Variables
 
 Sensitive configuration is not stored directly in the source code.
 
 ### Backend
 
-The backend requires:
+The backend uses the following environment variables:
 
 ```text
+DB_URL
 DB_USERNAME
 DB_PASSWORD
 JWT_SECRET
 FRONTEND_URL
 ```
 
-For production deployment, the database URL should also be configured using an environment variable.
-
-Example:
+Example Spring configuration:
 
 ```properties
-spring.datasource.url=${DB_URL}
-spring.datasource.username=${DB_USERNAME}
+spring.datasource.url=${DB_URL:jdbc:mysql://localhost:3306/fixflow}
+spring.datasource.username=${DB_USERNAME:root}
 spring.datasource.password=${DB_PASSWORD}
 
 jwt.secret=${JWT_SECRET}
 
-app.cors.allowed-origin=${FRONTEND_URL}
+app.cors.allowed-origin=${FRONTEND_URL:http://localhost:5173}
 ```
 
-Never commit real passwords or JWT secrets to the repository.
+The application can therefore use local development values while production values are supplied securely by the deployment environment.
+
+> Never commit real database passwords, JWT secrets, or other sensitive credentials to the repository.
 
 ### Frontend
 
-The deployed frontend can configure the backend address using:
+The frontend uses:
 
 ```text
 VITE_API_BASE_URL
 ```
 
-Example:
+During local development, the application can communicate with:
 
 ```text
-VITE_API_BASE_URL=https://your-backend-domain.example/api
+http://localhost:8080/api
 ```
+
+In production, `VITE_API_BASE_URL` points to the deployed Spring Boot API.
 
 ---
 
-## Running FixFlow Locally
+## 💻 Running FixFlow Locally
 
 ### Prerequisites
 
@@ -362,12 +527,16 @@ Install:
 - MySQL
 - Git
 
+---
+
 ### 1. Clone the Repository
 
 ```bash
 git clone https://github.com/anshkrog/FixFlow.git
 cd FixFlow
 ```
+
+---
 
 ### 2. Create the Database
 
@@ -377,9 +546,11 @@ Create a MySQL database:
 CREATE DATABASE fixflow;
 ```
 
+---
+
 ### 3. Configure Backend Environment Variables
 
-Configure the following values in your local environment:
+Configure:
 
 ```text
 DB_USERNAME
@@ -387,19 +558,35 @@ DB_PASSWORD
 JWT_SECRET
 ```
 
+For local development, the application defaults to:
+
+```text
+jdbc:mysql://localhost:3306/fixflow
+```
+
 `JWT_SECRET` should be a strong Base64-encoded signing key.
+
+Do not store real credentials directly in `application.properties`.
+
+---
 
 ### 4. Start the Backend
 
+Navigate to the backend directory:
+
 ```bash
 cd backend
+```
+
+Linux/macOS:
+
+```bash
 ./mvnw spring-boot:run
 ```
 
-On Windows PowerShell:
+Windows PowerShell:
 
 ```powershell
-cd backend
 .\mvnw.cmd spring-boot:run
 ```
 
@@ -409,13 +596,31 @@ The backend runs locally on:
 http://localhost:8080
 ```
 
+The API base URL is:
+
+```text
+http://localhost:8080/api
+```
+
+---
+
 ### 5. Start the Frontend
 
-Open another terminal:
+Open another terminal and navigate to the frontend:
 
 ```bash
 cd frontend
+```
+
+Install dependencies:
+
+```bash
 npm install
+```
+
+Start the Vite development server:
+
+```bash
 npm run dev
 ```
 
@@ -427,70 +632,188 @@ http://localhost:5173
 
 ---
 
-## Security Considerations
+## 📱 Responsive Design
 
-FixFlow implements several backend security measures:
+FixFlow is designed for both desktop and mobile usage.
 
-- BCrypt password hashing
-- JWT authentication
-- Stateless Spring Security configuration
-- Backend role-based authorization
-- Resident complaint ownership validation
-- Environment-based secret configuration
-- Configurable CORS origin
-- Protected administrative and staff operations
-
-Public registration should only create resident accounts. Administrative and staff roles should not be assignable through public registration.
-
----
-
-## Responsive Design
-
-The FixFlow interface is designed for desktop and mobile usage.
-
-The dashboards adapt their:
+The interface adapts:
 
 - Navigation
+- Dashboard layouts
 - Summary cards
 - Complaint queues
 - Search controls
 - Action panels
-- Forms
+- Complaint forms
+- Status information
 
 for smaller screen sizes.
 
 ---
 
-## Future Enhancements
+## 🧪 Tested End-to-End Workflow
 
-Possible extensions include:
+The deployed application has been tested across the complete complaint lifecycle.
+
+```text
+Resident
+   │
+   │ Creates complaint
+   ▼
+OPEN
+   │
+   │ Admin reviews complaint
+   │ Admin sets priority
+   │ Admin assigns staff
+   ▼
+ASSIGNED
+   │
+   │ Staff views assigned complaint
+   │ Staff starts work
+   ▼
+IN_PROGRESS
+   │
+   │ Staff completes work
+   ▼
+RESOLVED
+   │
+   │ Resident sees updated status
+   ▼
+Complete
+```
+
+This verifies communication between:
+
+```text
+React Frontend
+      ↓
+Spring Boot REST API
+      ↓
+Spring Security / JWT
+      ↓
+Service & Repository Layers
+      ↓
+MySQL Database
+```
+
+---
+
+## ☁️ Deployment
+
+### Frontend
+
+The React + Vite frontend is deployed on **Vercel**.
+
+### Backend
+
+The Spring Boot REST API is deployed on **Railway**.
+
+### Database
+
+The production MySQL database is hosted using **Railway MySQL**.
+
+### Deployment Flow
+
+```text
+GitHub
+   │
+   ├──── main branch update
+   │
+   ├──────────────► Vercel
+   │                  │
+   │                  └── Frontend Deployment
+   │
+   └──────────────► Railway
+                      │
+                      ├── Spring Boot Backend
+                      │
+                      └── MySQL Database
+```
+
+This allows new GitHub changes to be incorporated into the deployed application through the connected deployment services.
+
+---
+
+## 🚧 Future Enhancements
+
+Possible future extensions include:
 
 - Complaint image uploads
 - Email notifications
 - SMS notifications
-- Map-based issue location
+- Map-based issue locations
 - Administrative analytics
 - SLA monitoring
-- Complaint escalation
+- Automatic complaint escalation
 - Multiple staff teams
-- Audit history
+- Complaint audit history
 - Cloud file storage
-- AI-assisted complaint categorization and prioritization
+- Advanced reporting dashboards
+- AI-assisted complaint categorization
+- AI-assisted priority prediction
+- Duplicate complaint detection
+- Location-based staff assignment
 
 ---
 
-## Author
+## 🎯 Key Learning Outcomes
+
+Building FixFlow involved implementing and integrating:
+
+- Full-stack application architecture
+- REST API design
+- React frontend development
+- Spring Boot backend development
+- MySQL relational database integration
+- Spring Data JPA and Hibernate
+- JWT authentication
+- BCrypt password security
+- Role-based authorization
+- REST API consumption using Axios
+- Environment variable management
+- CORS configuration
+- Git and GitHub version control
+- Cloud frontend deployment
+- Cloud backend deployment
+- Production database deployment
+- End-to-end application testing
+
+---
+
+## 👨‍💻 Author
 
 **Ansh Kumar**
 
-B.Tech Computer Science & Engineering
+B.Tech — Computer Science & Engineering
 
 GitHub: [anshkrog](https://github.com/anshkrog)
 
 ---
 
-## Project Status
+## 📊 Project Status
 
-**Core application completed.**
+**✅ Deployed and Operational**
 
-FixFlow currently supports the complete complaint lifecycle across Resident, Administrator and Staff roles. Production deployment configuration is the next stage.
+FixFlow currently supports the complete complaint lifecycle across **Resident, Administrator, and Field Staff** roles.
+
+The production workflow has been successfully tested end-to-end:
+
+```text
+Resident reports complaint
+        ↓
+Admin reviews and prioritizes
+        ↓
+Admin assigns field staff
+        ↓
+Staff starts work
+        ↓
+Staff resolves complaint
+        ↓
+Resident sees resolved status
+```
+
+The **React frontend, Spring Boot REST API, JWT authentication, role-based authorization, and MySQL persistence** are deployed and functioning together in production.
+
+---
+
+⭐ If you find this project useful, consider giving the repository a star.
