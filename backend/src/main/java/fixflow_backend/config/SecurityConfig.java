@@ -38,7 +38,6 @@ public class SecurityConfig {
     @Value("${app.cors.allowed-origin}")
     private String allowedOrigin;
 
-
     public SecurityConfig(
             JwtAuthenticationFilter jwtAuthenticationFilter,
             UserRepository userRepository
@@ -47,20 +46,18 @@ public class SecurityConfig {
         this.userRepository = userRepository;
     }
 
-
-    // =========================================================
+    // =========================
     // PASSWORD ENCODER
-    // =========================================================
+    // =========================
 
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
-
-    // =========================================================
-    // DATABASE USER DETAILS SERVICE
-    // =========================================================
+    // =========================
+    // USER DETAILS SERVICE
+    // =========================
 
     @Bean
     public UserDetailsService userDetailsService() {
@@ -88,10 +85,9 @@ public class SecurityConfig {
         };
     }
 
-
-    // =========================================================
-    // SECURITY FILTER CHAIN
-    // =========================================================
+    // =========================
+    // SECURITY CONFIGURATION
+    // =========================
 
     @Bean
     public SecurityFilterChain securityFilterChain(
@@ -100,49 +96,40 @@ public class SecurityConfig {
 
         http
 
-                // -------------------------------------------------
-                // CORS
-                // -------------------------------------------------
+                // Enable CORS
                 .cors(cors ->
                         cors.configurationSource(
                                 corsConfigurationSource()
                         )
                 )
 
-                // -------------------------------------------------
-                // CSRF
-                // -------------------------------------------------
+                // Disable CSRF because we use JWT
                 .csrf(csrf ->
                         csrf.disable()
                 )
 
-                // -------------------------------------------------
-                // STATELESS JWT
-                // -------------------------------------------------
+                // Stateless JWT authentication
                 .sessionManagement(session ->
                         session.sessionCreationPolicy(
                                 SessionCreationPolicy.STATELESS
                         )
                 )
 
-                // -------------------------------------------------
-                // Disable browser authentication
-                // -------------------------------------------------
+                // Disable browser login
                 .formLogin(form ->
                         form.disable()
                 )
 
+                // Disable HTTP Basic
                 .httpBasic(basic ->
                         basic.disable()
                 )
 
-                // -------------------------------------------------
-                // Authorization
-                // -------------------------------------------------
+                // Authorization rules
                 .authorizeHttpRequests(auth ->
                         auth
 
-                                // CORS preflight requests
+                                // Allow CORS preflight requests
                                 .requestMatchers(
                                         org.springframework.http.HttpMethod.OPTIONS,
                                         "/**"
@@ -156,27 +143,23 @@ public class SecurityConfig {
                                 )
                                 .permitAll()
 
-                                // Everything else requires JWT
+                                // Everything else requires authentication
                                 .anyRequest()
                                 .authenticated()
                 )
 
-                // -------------------------------------------------
-                // JWT filter
-                // -------------------------------------------------
+                // JWT authentication filter
                 .addFilterBefore(
                         jwtAuthenticationFilter,
                         UsernamePasswordAuthenticationFilter.class
                 );
 
-
         return http.build();
     }
 
-
-    // =========================================================
+    // =========================
     // CORS CONFIGURATION
-    // =========================================================
+    // =========================
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
@@ -184,22 +167,14 @@ public class SecurityConfig {
         CorsConfiguration configuration =
                 new CorsConfiguration();
 
-
-        // ---------------------------------------------------------
-        // Frontend origin
-        // ---------------------------------------------------------
-
-        configuration.setAllowedOriginPatterns(
+        // Exact Vercel frontend origin
+        configuration.setAllowedOrigins(
                 List.of(
                         allowedOrigin
                 )
         );
 
-
-        // ---------------------------------------------------------
-        // Allowed HTTP methods
-        // ---------------------------------------------------------
-
+        // HTTP methods allowed from frontend
         configuration.setAllowedMethods(
                 List.of(
                         "GET",
@@ -211,35 +186,26 @@ public class SecurityConfig {
                 )
         );
 
-
-        // ---------------------------------------------------------
-        // Allowed request headers
-        // ---------------------------------------------------------
-
+        // Headers allowed from frontend
         configuration.setAllowedHeaders(
                 List.of(
-                        "*"
+                        "Authorization",
+                        "Content-Type",
+                        "Accept",
+                        "Origin",
+                        "X-Requested-With"
                 )
         );
 
-
-        // ---------------------------------------------------------
-        // Credentials
-        // ---------------------------------------------------------
-
+        // Allow cookies/credentials if needed
         configuration.setAllowCredentials(true);
 
-
-        // ---------------------------------------------------------
-        // Cache preflight response
-        // ---------------------------------------------------------
-
-        configuration.setMaxAge(3600L);
-
-
-        // ---------------------------------------------------------
-        // Register CORS configuration globally
-        // ---------------------------------------------------------
+        // Headers the browser is allowed to read
+        configuration.setExposedHeaders(
+                List.of(
+                        "Authorization"
+                )
+        );
 
         UrlBasedCorsConfigurationSource source =
                 new UrlBasedCorsConfigurationSource();
@@ -248,7 +214,6 @@ public class SecurityConfig {
                 "/**",
                 configuration
         );
-
 
         return source;
     }
