@@ -4,6 +4,7 @@ import fixflow_backend.entity.User;
 import fixflow_backend.repository.UserRepository;
 import fixflow_backend.security.JwtAuthenticationFilter;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -33,6 +34,10 @@ public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
     private final UserRepository userRepository;
+
+    @Value("${app.cors.allowed-origin}")
+    private String allowedOrigin;
+
 
     public SecurityConfig(
             JwtAuthenticationFilter jwtAuthenticationFilter,
@@ -95,26 +100,34 @@ public class SecurityConfig {
 
         http
 
-                // Enable CORS
+                // -------------------------------------------------
+                // CORS
+                // -------------------------------------------------
                 .cors(cors ->
                         cors.configurationSource(
                                 corsConfigurationSource()
                         )
                 )
 
-                // JWT authentication does not use CSRF sessions
+                // -------------------------------------------------
+                // CSRF
+                // -------------------------------------------------
                 .csrf(csrf ->
                         csrf.disable()
                 )
 
-                // FixFlow uses JWT, not HTTP sessions
+                // -------------------------------------------------
+                // STATELESS JWT
+                // -------------------------------------------------
                 .sessionManagement(session ->
                         session.sessionCreationPolicy(
                                 SessionCreationPolicy.STATELESS
                         )
                 )
 
-                // Disable default browser login mechanisms
+                // -------------------------------------------------
+                // Disable browser authentication
+                // -------------------------------------------------
                 .formLogin(form ->
                         form.disable()
                 )
@@ -123,30 +136,34 @@ public class SecurityConfig {
                         basic.disable()
                 )
 
-                // Endpoint authorization
+                // -------------------------------------------------
+                // Authorization
+                // -------------------------------------------------
                 .authorizeHttpRequests(auth ->
                         auth
 
-                                // Authentication endpoints are public
-                                .requestMatchers(
-                                        "/api/auth/register",
-                                        "/api/auth/login"
-                                )
-                                .permitAll()
-
-                                // Allow browser CORS preflight requests
+                                // CORS preflight requests
                                 .requestMatchers(
                                         org.springframework.http.HttpMethod.OPTIONS,
                                         "/**"
                                 )
                                 .permitAll()
 
-                                // Everything else requires authentication
+                                // Public authentication endpoints
+                                .requestMatchers(
+                                        "/api/auth/register",
+                                        "/api/auth/login"
+                                )
+                                .permitAll()
+
+                                // Everything else requires JWT
                                 .anyRequest()
                                 .authenticated()
                 )
 
-                // Validate JWT before Spring authentication filter
+                // -------------------------------------------------
+                // JWT filter
+                // -------------------------------------------------
                 .addFilterBefore(
                         jwtAuthenticationFilter,
                         UsernamePasswordAuthenticationFilter.class
@@ -167,14 +184,22 @@ public class SecurityConfig {
         CorsConfiguration configuration =
                 new CorsConfiguration();
 
-        // Your deployed Vercel frontend
-        configuration.setAllowedOrigins(
+
+        // ---------------------------------------------------------
+        // Frontend origin
+        // ---------------------------------------------------------
+
+        configuration.setAllowedOriginPatterns(
                 List.of(
-                        "https://fix-flow-69ecu2m6-ansh-ok.vercel.app"
+                        allowedOrigin
                 )
         );
 
-        // HTTP methods allowed from the frontend
+
+        // ---------------------------------------------------------
+        // Allowed HTTP methods
+        // ---------------------------------------------------------
+
         configuration.setAllowedMethods(
                 List.of(
                         "GET",
@@ -186,19 +211,35 @@ public class SecurityConfig {
                 )
         );
 
-        // Headers allowed from the frontend
+
+        // ---------------------------------------------------------
+        // Allowed request headers
+        // ---------------------------------------------------------
+
         configuration.setAllowedHeaders(
                 List.of(
-                        "Authorization",
-                        "Content-Type",
-                        "Accept",
-                        "Origin",
-                        "X-Requested-With"
+                        "*"
                 )
         );
 
-        // Required if the frontend sends credentials/cookies
+
+        // ---------------------------------------------------------
+        // Credentials
+        // ---------------------------------------------------------
+
         configuration.setAllowCredentials(true);
+
+
+        // ---------------------------------------------------------
+        // Cache preflight response
+        // ---------------------------------------------------------
+
+        configuration.setMaxAge(3600L);
+
+
+        // ---------------------------------------------------------
+        // Register CORS configuration globally
+        // ---------------------------------------------------------
 
         UrlBasedCorsConfigurationSource source =
                 new UrlBasedCorsConfigurationSource();
@@ -207,6 +248,7 @@ public class SecurityConfig {
                 "/**",
                 configuration
         );
+
 
         return source;
     }
