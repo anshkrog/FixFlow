@@ -4,7 +4,6 @@ import fixflow_backend.entity.User;
 import fixflow_backend.repository.UserRepository;
 import fixflow_backend.security.JwtAuthenticationFilter;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -35,10 +34,6 @@ public class SecurityConfig {
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
     private final UserRepository userRepository;
 
-    @Value("${app.cors.allowed-origin}")
-    private String allowedOrigin;
-
-
     public SecurityConfig(
             JwtAuthenticationFilter jwtAuthenticationFilter,
             UserRepository userRepository
@@ -54,7 +49,6 @@ public class SecurityConfig {
 
     @Bean
     public PasswordEncoder passwordEncoder() {
-
         return new BCryptPasswordEncoder();
     }
 
@@ -76,12 +70,10 @@ public class SecurityConfig {
                             )
                     );
 
-
             SimpleGrantedAuthority authority =
                     new SimpleGrantedAuthority(
                             "ROLE_" + user.getRole().name()
                     );
-
 
             return org.springframework.security.core.userdetails.User
                     .withUsername(user.getEmail())
@@ -135,12 +127,21 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth ->
                         auth
 
+                                // Authentication endpoints are public
                                 .requestMatchers(
                                         "/api/auth/register",
                                         "/api/auth/login"
                                 )
                                 .permitAll()
 
+                                // Allow browser CORS preflight requests
+                                .requestMatchers(
+                                        org.springframework.http.HttpMethod.OPTIONS,
+                                        "/**"
+                                )
+                                .permitAll()
+
+                                // Everything else requires authentication
                                 .anyRequest()
                                 .authenticated()
                 )
@@ -166,14 +167,14 @@ public class SecurityConfig {
         CorsConfiguration configuration =
                 new CorsConfiguration();
 
-
+        // Your deployed Vercel frontend
         configuration.setAllowedOrigins(
                 List.of(
-                        allowedOrigin
+                        "https://fix-flow-69ecu2m6-ansh-ok.vercel.app"
                 )
         );
 
-
+        // HTTP methods allowed from the frontend
         configuration.setAllowedMethods(
                 List.of(
                         "GET",
@@ -185,27 +186,27 @@ public class SecurityConfig {
                 )
         );
 
-
+        // Headers allowed from the frontend
         configuration.setAllowedHeaders(
                 List.of(
                         "Authorization",
-                        "Content-Type"
+                        "Content-Type",
+                        "Accept",
+                        "Origin",
+                        "X-Requested-With"
                 )
         );
 
-
+        // Required if the frontend sends credentials/cookies
         configuration.setAllowCredentials(true);
-
 
         UrlBasedCorsConfigurationSource source =
                 new UrlBasedCorsConfigurationSource();
-
 
         source.registerCorsConfiguration(
                 "/**",
                 configuration
         );
-
 
         return source;
     }
